@@ -1,0 +1,32 @@
+# Everything needed in production
+
+# Flask
+Flask==2.1.2
+Werkzeug==2.1.2
+requests==2.27.1
+
+# Deployment
+gevent==21.1.2
+gunicorn==20.1.0
+supervisor==4.2.2
+python-json-logger==2.0.1
+
+# Environment variable parsing
+environs==9.5.0
+
+# Flask Restful
+flask-restful==0.3.9
+
+# Swagger
+flasgger==0.9.5
+
+# JSON Schema Input Validation
+jsonschema==4.6.0
+
+# DataDog Tracing - required even when running with gunicorn
+ddtrace==0.58.4
+
+# Redis
+Flask-RQ2[cli]==18.3
+redis==3.5.3
+rq==1.10.1

@@ -1,0 +1,24 @@
+{
+  "name": "unido-printing-service",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "",
+    "start": "npm run flask-server",
+    "flask-server": "flask run --host=0.0.0.0 --port=7095",
+    "test": "coverage run -m flask test && coverage report && coverage html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://toukirnaimpac@bitbucket.org/worldwebgroup/unido-printing-service.git"
+  },
+  "author": "Clint Coombs",
+  "license": "MIT",
+  "engines": {
+    "node": ">=12.22.1"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}

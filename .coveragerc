@@ -1,0 +1,14 @@
+[html]
+directory = report
+
+[run]
+include = unido_printing_service/**
+
+omit =
+    **/__init__.py
+    unido_printing_service/commands.py
+
+[report]
+exclude_lines =
+    ^import
+    ^from

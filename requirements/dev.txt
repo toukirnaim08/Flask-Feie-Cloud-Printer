@@ -1,0 +1,18 @@
+# Everything the developer needs in addition to the production requirements
+-r prod.txt
+
+# Testing
+requests-mock==1.9.3
+pytest==7.1.2
+WebTest==3.0.0
+factory-boy==3.2.1
+pdbpp==0.10.3
+
+# Code Coverage
+pytest-cov==3.0.0
+coverage==6.4.1
+
+# Testing Redis Instance for Flask RQ
+fakeredis==1.8
+# implicit requirement of above for some operations .. difficult to install on windows
+lupa==1.13
