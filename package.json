@@ -1,5 +1,5 @@
 {
-  "name": "unido-printing-service",
+  "name": "printing_solution",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -10,9 +10,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://toukirnaimpac@bitbucket.org/worldwebgroup/unido-printing-service.git"
+    "url": "https://github.com/toukirnaim08/Flask-Feie-Cloud-Printer.git"
   },
-  "author": "Clint Coombs",
+  "author": "Toukir Naim",
   "license": "MIT",
   "engines": {
     "node": ">=12.22.1"

@@ -2,11 +2,11 @@
 from flasgger import Swagger
 from flask_rq2 import RQ
 
-import printing_solution.services.svc_print as svc_print
+import printing_solution.services.feie_printer as feie_printer
 
-DEFAULT_QUEUE = "printing-default"
+DEFAULT_QUEUE = "printing-queue"
 
 rq = RQ()
 swagger = Swagger()
 
-print_service = svc_print.RemotePrintService()
+print_service = feie_printer.FeiePrintService()

@@ -22,17 +22,10 @@ COPY shell_scripts shell_scripts
 
 COPY *.py ./
 
-COPY unido_printing_service unido_printing_service
+COPY printing_solution printing_solution
 
 # DataDog Stuff
-ARG GIT_REVISION
-ARG FULL_VERSION
 ARG PACKAGE_NAME
-
-LABEL com.datadoghq.tags.service=$PACKAGE_NAME
-LABEL com.datadoghq.tags.version=$FULL_VERSION
-ENV DD_SERVICE $PACKAGE_NAME
-ENV DD_VERSION $FULL_VERSION
 
 EXPOSE 7095
 ENTRYPOINT ["/bin/bash", "shell_scripts/supervisord_entrypoint.sh"]

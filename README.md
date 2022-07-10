@@ -4,7 +4,7 @@
 Run the following commands to bootstrap your environment if you are unable to run the application using Docker
 
 ```bash
-cd unido-printing-service
+cd printing-solution
 pip install -r requirements.txt
 npm install
 npm run-script build
@@ -16,7 +16,7 @@ npm start  # run the webpack dev server and flask server using concurrently
 For this you will need to use a comment something like the following. In this case we refer to the config file found in the unido-config repo.
 
 ```shell
-docker run -p 7095:7095 --env-file ../unido-config/prod/docker/unido-printing-service/env.cfg pacdocker.azurecr.io/unido-printing-service-production:latest 
+docker run -p 7095:7095 --env-file ../unido-config/prod/docker/unido-printing-service/env.cfg pacdocker.azurecr.io/unido-printing-service-production:latest
 ```
 
 ## Running Workers Manually

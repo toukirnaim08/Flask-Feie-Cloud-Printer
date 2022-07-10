@@ -15,14 +15,12 @@ MAX_ITERATION = 32
 
 # 10 minutes time out 60*10
 @extensions.rq.job(result_ttl=DEFAULT_RESULT_TTL, ttl=20 * 60, timeout=60 * 10)
-def async_send_printing_request(heading: str,
+def async_send_printing_request(ticket_number: str,
                                 qr: str,
                                 min_start_time: typing.Optional[str] = None,
-                                include_timestamp: bool = True,
-                                body: typing.Optional[typing.List[str]] = None,
                                 iteration: int = 1):
     """
-    Send printing request to cloud.
+    Send printing request to cloud asynchronously.
     """
     def reschedule():
         if iteration <= MAX_ITERATION:
@@ -31,16 +29,14 @@ def async_send_printing_request(heading: str,
                 iteration=iteration + 1,
                 # In the event of failure we set min_start_time to be 30 seconds in the future
                 min_start_time=(dt.datetime.utcnow() + dt.timedelta(seconds=MAX_TIME_BEFORE_RETRY)).isoformat(),
-                heading=heading,
-                qr=qr,
-                body=body,
-                include_timestamp=include_timestamp
+                ticket_number=ticket_number,
+                qr=qr
             )
         else:
             flask.current_app.logger.info(f"Tried maximum number of times to reschedule job")
 
     try:
-        flask.current_app.logger.info(f"Sending request for wallet_id:{heading} with body: {body}")
+        flask.current_app.logger.info(f"Sending request for ticket:{ticket_number} with qr: {qr}")
 
         if min_start_time:
             # If min_start_time exists that means the last attempt was a failure
@@ -51,11 +47,8 @@ def async_send_printing_request(heading: str,
                 time.sleep(wait_period)
 
         # We can use printing service to send payload
-        order_id: typing.Optional[str] = extensions.print_service.send_printing_request(heading=heading,
-                                                                                        qr=qr,
-                                                                                        body=body,
-                                                                                        include_timestamp=
-                                                                                        include_timestamp)
+        order_id: typing.Optional[str] = extensions.print_service.send_printing_request(ticket_number=ticket_number,
+                                                                                        qr=qr)
 
         if not order_id:
             flask.current_app.logger.info(f"No order id found calling rq job again. "
@@ -83,6 +76,7 @@ def __queuer(fn: typing.Callable, job_id: str, **args) -> bool:
     # waiting to be processed. In effect, all the conditions below are trying to detect such a scenario.
     if not job or job.created_at < dt.datetime.utcnow() - dt.timedelta(minutes=MAX_TIME_BEFORE_RESUBMIT) or \
             job.is_failed or job.is_canceled or job.is_stopped or job.is_deferred:
+        # Call async printing task.
         fn(job_id=job_id, queue=extensions.DEFAULT_QUEUE, **args)
         return True
     flask.current_app.logger.warning(f"will not queue job {job_id} - already queued at {job.created_at}")

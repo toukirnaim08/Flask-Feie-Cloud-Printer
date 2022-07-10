@@ -1,7 +1,6 @@
 import typing
 import requests
 import flask
-import datetime as dt
 
 
 class APIException(Exception):
@@ -10,14 +9,10 @@ class APIException(Exception):
         super().__init__(message)
 
 
-class RemotePrintService:
-    # Two types of printing formats found "Ticket Print Format" and "Label Print Format"
-    # Also, two printer management portals found http://global1.feieapi.com/FPServer/ and
-    # http://developer.de.feieyun.com/#/dashboard
-    # Apparently, our current printers support http://global1.feieapi.com/FPServer/ and
-    # allow "Ticket Print Format" only
-    # see https://github.com/stark-tech-space/feieyun-node/packages/524242#ticket-print-format
-    # for api documentation see http://www.feieyun.com/open/apidoc-en.html
+class FeiePrintService:
+    """Two types of printing formats found "Ticket Print Format" and
+    "Label Print Format". We will use "Ticket Print Format" only. see
+     https://github.com/stark-tech-space/feieyun-node/packages/524242#ticket-print-format"""
     DEFAULT_TIMEOUT = 5  # seconds
     MAX_DATA_CHUNK = 8
 
@@ -67,45 +62,16 @@ class RemotePrintService:
         return f"<C>{text}</C>{'<BR>' if new_line else ''}"
 
     @staticmethod
-    def generate_printable_content(heading: str,
-                                   qr: str,
-                                   body: typing.Optional[typing.List[str]] = None,
-                                   include_timestamp: bool = True) -> str:
-        # Add heading and qr code in large font and center position
-        print_content = RemotePrintService.heading(heading)
-        print_content += RemotePrintService.qr(qr)
-
-        # If body doest exist, we can use qr code to create body
-        if not body:
-            body = ['prod', '-----------']
-            body += [chunked_data for chunked_data in [qr[i:i + RemotePrintService.MAX_DATA_CHUNK]
-                                                       for i in range(0, len(qr), RemotePrintService.MAX_DATA_CHUNK)]]
-            body += ['-----------']
-            body += [dt.datetime.utcnow().isoformat() if include_timestamp else '']
-
-        # Convert body into a printable format
-        for value in body:
-            # If null or empty string found, we can add some dots in center
-            if not value:
-                print_content += RemotePrintService.heading("-----------")
-                continue
-
-            # If the element is the last value of the list and the timestamp flag is on
-            if include_timestamp and value == body[-1]:
-                # Print timestamp in small font
-                print_content += RemotePrintService.center(value)
-                continue
-
-            # We use large font for all the values except timestamp
-            print_content += RemotePrintService.heading(value)
-
+    def generate_printable_content(ticket_number: str,
+                                   qr: str) -> str:
+        # Add name and qr code in large font and center position
+        print_content = FeiePrintService.heading(ticket_number)
+        print_content += FeiePrintService.qr(qr)
         return print_content
 
     def send_printing_request(self,
-                              heading: str,
+                              ticket_number: str,
                               qr: str,
-                              include_timestamp: bool = True,
-                              body: typing.Optional[typing.List[str]] = None,
                               times=1) -> typing.Optional[str]:
         if not self.enabled:
             return
@@ -116,10 +82,8 @@ class RemotePrintService:
 
         params = {
             'sn': self.sn,
-            'printContent': RemotePrintService.generate_printable_content(heading=heading,
-                                                                          qr=qr,
-                                                                          body=body,
-                                                                          include_timestamp=include_timestamp),
+            'printContent': FeiePrintService.generate_printable_content(ticket_number=ticket_number,
+                                                                        qr=qr),
             'key': self.key,
             'times': times
         }
@@ -127,7 +91,7 @@ class RemotePrintService:
         url = f"{self.base_url}/FPServer/printOrderAction"
 
         try:
-            r = requests.post(url, data=params, timeout=RemotePrintService.DEFAULT_TIMEOUT)
+            r = requests.post(url, data=params, timeout=FeiePrintService.DEFAULT_TIMEOUT)
         except Exception as e:
             flask.current_app.logger.warning(
                 f"Unable to send printing request - {e}",
@@ -138,7 +102,7 @@ class RemotePrintService:
                 }})
             raise
 
-        RemotePrintService.__generic_failure(r)
+        FeiePrintService.__generic_failure(r)
 
         # A valid response
         # {"ret":0,"msg":"ok","data":"62944f7ff4b4ae46db963a89","serverExecutedTime":0} "data" is the order id

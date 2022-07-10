@@ -7,20 +7,22 @@ import requests_mock
 
 import printing_solution.extensions as extensions
 
+# Set mock responses
 CONFIGS = {
-    "printer_svc_01": {
+    "printer_mock_01": {
         "url": f"http://fake-printer-com/FPServer/printOrderAction",
         "method": "POST",
         "data": '{"ret": 0, "msg": "ok", "data": "62944f7ff4b4ae46db963a89", "serverExecutedTime": 0}'
     },
-    "printer_svc_02": {
-        "url": "/rest/v1/printing",
+    "printer_mock_02": {
+        "url": "/rest/v1/print_ticket",
         "method": "POST",
         "data": '{"response": "ok"}'
     },
 }
 
 
+# Create mocks form config json
 def load_mock_from_file(
     key: typing.Optional[str],
     mock: requests_mock.Mocker,

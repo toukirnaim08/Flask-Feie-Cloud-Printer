@@ -14,7 +14,7 @@ env.read_env()
 ENV = env.str("FLASK_ENV", default="production")
 DEBUG = ENV == "development"
 
-APPLICATION_ROOT = "/unido-printing-service"
+APPLICATION_ROOT = "/printing-solution"
 
 RQ_REDIS_URL = env.str("RQ_REDIS_URL", "redis://localhost:6379/0")
 

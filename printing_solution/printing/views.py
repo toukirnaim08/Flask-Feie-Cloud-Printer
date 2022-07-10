@@ -17,7 +17,7 @@ def register_blueprint(app):
                              static_folder='../static')
     api = Api(api_bp)
 
-    api.add_resource(PrintContent, '/print')
+    api.add_resource(PrintContent, '/print_ticket')
     app.register_blueprint(api_bp)
 
 
@@ -25,17 +25,15 @@ class PrintContent(Resource):
     PRINT_CONTENT_JSONSCHEMA = {
         "type": "object",
         "properties": {
-            "heading": {"type": "string"},
+            "ticket_number": {"type": "string"},
             "qr": {"type": "string"},
-            "body": {"type": "array"},
-            "include_timestamp": {"type": "boolean"},
         },
-        "required": ["heading", "qr", "include_timestamp"],
+        "required": ["ticket_number", "qr"],
         "additionalProperties": False
     }
 
     def post(self):
-        """Send request to cloud printer
+        """Send request to print ticket
         ---
         requestBody:
           required: true
@@ -44,22 +42,13 @@ class PrintContent(Resource):
               schema:
                 type: object
                 properties:
-                  heading:
+                  ticket_number:
                     type: string
                   qr:
                     type: string
-                  body:
-                    type: array
-                    items:
-                      type: string
-                      example: "prod"
-                  include_timestamp:
-                    type: boolean
-                    default: true
                 required:
-                  - heading
+                  - ticket_number
                   - qr
-                  - include_timestamp
         responses:
           '200':
             response: ok
@@ -67,16 +56,15 @@ class PrintContent(Resource):
         # Now apply json schema validation
         r = PrintContent.validate_json_schema(PrintContent.PRINT_CONTENT_JSONSCHEMA,
                                               payload_expected=True)
-        # We generate job id using heading, data and body
+        # We generate hash/job_id using ticket, qr
         job_id = PrintContent.sha256(data=r)
 
+        # Send printing request asynchronously using redis queue.
         # If we pass in job_id to queue, then only one task can exist with that name
         tasks.queue_async_send_printing_request(
             job_id=job_id,
-            heading=r['heading'],
-            qr=r['qr'],
-            body=r['body'] if 'body' in r else None,
-            include_timestamp=r['include_timestamp']
+            ticket_number=r['ticket_number'],
+            qr=r['qr']
         )
 
         return flask.jsonify({"response": "ok"})
@@ -103,10 +91,7 @@ class PrintContent(Resource):
 
     @staticmethod
     def sha256(data: typing.Dict):
-        x = data['heading'] + data['qr']
-        if 'body' in data:
-            x += "".join(data['body'])
-
+        x = data['ticket_number'] + data['qr']
         m = hashlib.sha256()
         m.update(x.encode('utf8'))
         return m.hexdigest()

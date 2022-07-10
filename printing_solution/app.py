@@ -1,7 +1,7 @@
 import flask
 from flask import Flask
 
-from printing_solution import printing, tools, commands
+from printing_solution import printing, commands
 from printing_solution.extensions import (
     rq,
     swagger,
@@ -31,7 +31,7 @@ def register_extensions(app):
 def register_blueprints(app):
     """Register Flask blueprints."""
     printing.views.register_blueprint(app)
-    tools.views.register_blueprint(app)
+    # tools.views.register_blueprint(app)
 
     @app.route('/')
     def home():
