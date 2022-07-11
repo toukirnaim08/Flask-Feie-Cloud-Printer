@@ -4,7 +4,7 @@ Cloud printing refers to the technology that printing equipment obtains printing
 
 Cloud printing technology helps merchants improve operational efficiency, and integrates Fei'e cloud services to open up more business scenarios.
 
-Feie cloud service api details can be found on http://www.feieyun.com/open/apidoc-en.html. 
+Feie cloud service api details can be found on http://www.feieyun.com/open/apidoc-en.html.
 And all the availble tags for printing tickets are given below, for example ```<BR>``` is used for new line.
 
 ```
@@ -48,9 +48,6 @@ After creating image successfully you can execute the following command to run t
 ```shell
 docker run --network=host \
 -e LOG_LEVEL='info' \
--e GUNICORN_WORKERS='1' \
--e ASYNC_WORKERS='2' \
--e DD_SERVICE='printing-default' \
 -e PRINTER_SN='sn' \
 -e PRINTER_KEY='key' \
 -e RQ_REDIS_URL='redis://localhost:6379/0' \
@@ -66,7 +63,7 @@ To run them in a dev environment, you need to:
 * Run: python3 -m flask rq worker printing-default
   * the queue will typically be printing-queue
 
-Worker wont work on windwos as The rq library uses os.fork that is not available on Windows. 
+Worker wont work on windwos as The rq library uses os.fork that is not available on Windows.
 And dont forget to run redis locally. If you dont have redis installed, you run redis via docker.
 
 
@@ -79,4 +76,5 @@ user RQ_REDIS_URL to connect worker with redis
 RQ_REDIS_URL=redis://localhost:6379/0
 ```
 
+A test is implemented with around 80% of coverage.
 Finally, open swagger ui on http://127.0.0.1:5000/

@@ -17,7 +17,7 @@ RUN pip install --no-cache --trusted-host pypi.python.org --trusted-host files.p
 
 COPY logging.conf logging.conf
 COPY supervisord.conf /etc/supervisor/supervisord.conf
-COPY supervisord_programs /etc/supervisor/conf.d
+COPY supervisord_processes /etc/supervisor/conf.d
 COPY shell_scripts shell_scripts
 
 COPY *.py ./

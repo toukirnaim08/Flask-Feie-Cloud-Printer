@@ -2,11 +2,11 @@
 directory = report
 
 [run]
-include = unido_printing_service/**
+include = printing_solution/**
 
 omit =
     **/__init__.py
-    unido_printing_service/commands.py
+    printing_service/commands.py
 
 [report]
 exclude_lines =
